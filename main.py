@@ -16,7 +16,7 @@ class Config():
 #Generalisera skript
 def getSQLStr(tabell):
     tabell = tabell.strip()
-    topX = ' top 10 '
+    topX = ' top 1 '
     if (tabell.lower() == 'dk_kamerabildbesiktning'):
         return ('SELECT' +topX+ ' DK_kamerabildId,lopnr, bild, notering FROM ' + tabell)
 
@@ -33,22 +33,25 @@ def execSQL(config, conn):
         SQLStr = getSQLStr(tabell)
         cursor.execute(SQLStr)
         rows = cursor.fetchall()
+        try:
+            os.mkdir(tabell)
+        except Exception:
+            pass
         for row in rows:
-            print(str(row.DK_kamerabildId) + ", " + str(row.lopnr) + ", " + row.notering)
+            #print(str(row.DK_kamerabildId) + ", " + str(row.lopnr) + ", " + str(row.notering))
+            filnamn = tabell.strip() +'/' + str(row.DK_kamerabildId)+"_" +str(row.lopnr)
+            with open(filnamn+ '.jpg', 'wb') as fil:
+                fil.write(row.bild)
+
 
 
 def main():
     config = Config()
     conn = pyodbc.connect(config.tostr())
-
     execSQL(config, conn)
-    try:
-        os.mkdir(dir)
-    except Exception:
-        pass
+    print('klar')
 
+main()
     #for row in rows:
     #    filnamn = dir +'/' + str(row.DK_kamerabildId)+"_" +str(row.radnr)
         #print(row)
-
-main()
