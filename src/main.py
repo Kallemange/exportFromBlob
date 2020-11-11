@@ -3,7 +3,7 @@ import os
 
 class Config():
     def __init__(self):
-        with open('config.txt','r') as file:
+        with open('../config.txt','r') as file:
             content = file.readlines()
             self.server = content[0].strip()
             self.database = content[1].strip()
@@ -26,19 +26,20 @@ def getSQLStr(tabell):
 
 
 def execSQL(config, conn):
+    print(config.tostr())
     cursor = conn.cursor()
     for tabell in config.tables:
         SQLStr = getSQLStr(tabell)
         cursor.execute(SQLStr)
         rows = cursor.fetchall()
         try:
-            os.mkdir(tabell)
+            os.mkdir('../' +tabell)
         except Exception:
             pass
         for row in rows:
             #print(str(row.DK_kamerabildId) + ", " + str(row.lopnr) + ", " + str(row.notering))
             filnamn = tabell.strip() +'/' + str(row.DK_kamerabildId)+"_" +str(row.lopnr)
-            with open(filnamn+ '.jpg', 'wb') as fil:
+            with open('../' +filnamn+ '.jpg', 'wb') as fil:
                 fil.write(row.bild)
 
 
