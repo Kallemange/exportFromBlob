@@ -12,7 +12,8 @@ class Config():
             self.tables = content[2].split()
     def tostr(self):
         return 'Driver={SQL Server};Server='+self.server +';Database='+self.database +';Trusted_Connection=yes;'
-
+## TODO:
+#Generalisera skript
 def getSQLStr(tabell):
     tabell = tabell.strip()
     topX = ' top 10 '

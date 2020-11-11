@@ -1,1 +1,5 @@
 Projekt för att importera/Exportera BLOBfiler ifrån SQL Server
+
+TODO
+#Lägg till funktionalitet för import
+#generalisera sql-strängen och exec-fråga
