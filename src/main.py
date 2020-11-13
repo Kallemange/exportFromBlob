@@ -1,7 +1,7 @@
 import pyodbc
 import os
 
-class Config():
+class Config:
     def __init__(self):
         with open('../config.txt','r') as file:
             content = file.readlines()
@@ -12,42 +12,52 @@ class Config():
         return 'Driver={SQL Server};Server='+self.server +';Database='+self.database +';Trusted_Connection=yes;'
 ## TODO:
 #Generalisera skript
-def getSQLStr(tabell):
-    tabell = tabell.strip()
-    topX = ' top 1 '
-    if (tabell.lower() == 'dk_kamerabildbesiktning'):
-        return ('SELECT' +topX+ ' DK_kamerabildId,lopnr, bild, notering FROM ' + tabell)
+class SQLExporter:
 
-    elif(tabell.lower() == 'dk_kamerabildbesiktrad'):
-        return 'SELECT' +topX+ ' DK_kamerabildId,radlopnr AS lopnr, bild, notering FROM ' + tabell
+    def __init__(self, config):
+        self.config = config
+        self.conn = pyodbc.connect(self.config.tostr())
 
-    elif(tabell.lower() == 'dk_kamerabildserviceorderrad'):
-        return 'SELECT' +topX+ ' DK_kamerabildId,radnr lopnr, bild, notering FROM ' + tabell
+    def getSQLStr(self, tabell):
+        tabell = tabell.strip()
+        topX = ' top 1 '
+        if (tabell.lower() == 'dk_kamerabildbesiktning'):
+            return ('SELECT' +topX+ ' DK_kamerabildId,lopnr, bild, notering FROM ' + tabell)
 
+        elif(tabell.lower() == 'dk_kamerabildbesiktrad'):
+            return 'SELECT' +topX+ ' DK_kamerabildId,radlopnr AS lopnr, bild, notering FROM ' + tabell
 
-def execSQL(config, conn):
-    print(config.tostr())
-    cursor = conn.cursor()
-    for tabell in config.tables:
-        SQLStr = getSQLStr(tabell)
-        cursor.execute(SQLStr)
-        rows = cursor.fetchall()
+        elif(tabell.lower() == 'dk_kamerabildserviceorderrad'):
+            return 'SELECT' +topX+ ' DK_kamerabildId,radnr lopnr, bild, notering FROM ' + tabell
+
+    def newDir(self, path):
         try:
-            os.mkdir('../' +tabell)
+            os.mkdir(path)
         except Exception:
             pass
-        for row in rows:
-            #print(str(row.DK_kamerabildId) + ", " + str(row.lopnr) + ", " + str(row.notering))
-            filnamn = tabell.strip() +'/' + str(row.DK_kamerabildId)+"_" +str(row.lopnr)
-            with open('../' +filnamn+ '.jpg', 'wb') as fil:
-                fil.write(row.bild)
+
+    def execSQL(self): #config, conn):
+        cursor = self.conn.cursor()
+        self.newDir('../../out')
+        for tabell in self.config.tables:
+            SQLStr = self.getSQLStr(tabell)
+            cursor.execute(SQLStr)
+            rows = cursor.fetchall()
+            self.newDir('../../out/' +tabell)
+            for row in rows:
+                #print(str(row.DK_kamerabildId) + ", " + str(row.lopnr) + ", " + str(row.notering))
+                filnamn = tabell.strip() +'/' + str(row.DK_kamerabildId)+"_" +str(row.lopnr)
+                with open('../../out/' +filnamn+ '.jpg', 'wb') as fil:
+                    fil.write(row.bild)
 
 
 
 def main():
     config = Config()
-    conn = pyodbc.connect(config.tostr())
-    execSQL(config, conn)
+    exporter = SQLExporter(config)
+    exporter.execSQL()
     print('klar')
 
-main()
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,19 @@
 Projekt för att importera/Exportera BLOBfiler ifrån SQL Server
+Programmet kan köras via executable fil i dist.
+Alternativt direkt i python via main.py, stå då i src och kör command: py main.py (kräver installerat python)
+
+Programmet hämtar information ifrån config.txt fil
+Informationen skall specificeras som:
+<Server>
+<Databas>
+<Tabell1>, <Tabell2> ...
+
+ex
+Solpmsql2
+Konvertering_Gamlabyn
+dk_kamerabildbesiktning dk_kamerabildserviceorderrad
+
+
 
 TODO
 #Lägg till funktionalitet för import
